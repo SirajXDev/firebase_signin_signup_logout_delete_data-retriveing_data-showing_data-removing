@@ -20,12 +20,13 @@ class _HomeScreenState extends State<HomeScreen> {
   bool isdataadded = false;
   @override
   Widget build(BuildContext context) {
+    late Query query;
     TextEditingController titlecontroller = TextEditingController();
     TextEditingController descriptioncontroller = TextEditingController();
     FirebaseAuth auth = FirebaseAuth.instance;
 
     DatabaseReference db = FirebaseDatabase.instance.ref('todo');
-
+    query=db.orderByChild('uid').equalTo(FirebaseAuth.instance.currentUser!.uid);
     return Scaffold(
       appBar: AppBar(
           title: const Text('home screen'),
@@ -110,6 +111,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 } else {
                   // print('this is current time ${id}');
                   db.child(id).set({
+                    'uid':FirebaseAuth.instance.currentUser!.uid,
                     'title': titlecontroller.text.trim(),
                     'description': descriptioncontroller.text.trim(),
                     'id': id
@@ -134,7 +136,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           Expanded(
               child: FirebaseAnimatedList(
-                  query: db,
+                  query: query,
                   itemBuilder: (context, snapshot, _, index) {
                     return GestureDetector(
                       onTap: () {
